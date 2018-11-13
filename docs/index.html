@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Curry App - Open Bank API Callback</title>
+
+
+<script>
+const tokenApiURL = 'https://testapi.open-platform.or.kr/oauth/2.0/token';
+
+/**
+ * 페이지 로딩이 되면 모바일앱에 token 발급을 위한 정보를 요청한다.
+ */
+ document.addEventListener("DOMContentLoaded", function(event) 
+ {
+     //앱 정보를 받기 위한 리스너 설정 
+    document.addEventListener('message', function(e) 
+    {
+        if(!e.data){document.getElementById("errorNotice").innerText = "앱에서 보낸 api 요청 정보가 올바르지 않습니다!"}
+        var bankApiInfo =   JSON.parse(e.data);
+        
+        const params    =   getTokenParams(bankApiInfo);
+
+        requestTokenApi(params);
+    });
+
+
+    /**!! 구현 사유 !!
+     * 페이지 로딩 후, 모바일앱에 정보를 요청하면 실패한다(현 BankApi 콜백 페이지)
+     * 1초 후 비동기적으로 호출 시, 성공
+     */
+    setTimeout(function(){ requestBankApiInfo(); }, 1000);
+
+    
+    /**TODO (미구현)
+     * 앱으로 정보를 못받았을 경우 예외처리
+     *  - 실패에 대한 Notice 및 close 버튼 활성화
+     */
+});
+
+
+/**
+ * 모바일앱에 BankApi정보(clientID, clientSecrete 등..) 요청
+ */
+function requestBankApiInfo()
+{
+    var postData = {
+        type : 'ASK_BANKAPIINFO',
+    };
+    var data = JSON.stringify(postData);
+
+    window.postMessage(data);
+}
+
+
+/**
+ * callback 페이지 호출시 파라미터 값을 추출하여, BankAPI Token 요청 파라미터 값을 설정
+ */
+function getTokenParams(bankApiInfo) {
+    //get Authorization code
+    var url_string = window.location.href; // www.test.com?filename=test
+    var url = new URL(url_string);
+    var codeParamValue = url.searchParams.get("code");
+
+
+    //Validation
+    if(!codeParamValue || codeParamValue.length === 0){errorNotice("비 정상 동작으로 회원인증에 실패 했습니다, 창을 닫은 후, 재 시도 부탁 드립니다.", true)}
+    if(!bankApiInfo.client_id || bankApiInfo.client_id.length === 0){errorNotice("앱으로부터 Token요청 정보를 가져오지 못 했습니다, 창을 닫은 후, 재 시도 부탁 드립니다.", true)}
+    if(!bankApiInfo.client_secret || bankApiInfo.client_secret.length === 0){errorNotice("앱으로부터 Token요청 정보를 가져오지 못 했습니다, 창을 닫은 후, 재 시도 부탁 드립니다.", true)}
+    if(!bankApiInfo.redirect_uri || bankApiInfo.redirect_uri.length === 0){errorNotice("앱으로부터 Token요청 정보를 가져오지 못 했습니다, 창을 닫은 후, 재 시도 부탁 드립니다.", true)}
+
+    const params = {
+        code: codeParamValue,
+        client_id: bankApiInfo.client_id,
+        client_secret: bankApiInfo.client_secret,
+        redirect_uri: bankApiInfo.redirect_uri,
+        grant_type: 'authorization_code',
+    }
+    
+    document.getElementById("code").innerText = codeParamValue;
+    document.getElementById("client_id").innerText = bankApiInfo.client_id;
+    document.getElementById("client_secret").innerText = bankApiInfo.client_secret;
+    document.getElementById("redirect_uri").innerText = bankApiInfo.redirect_uri;
+
+    return params;
+}
+
+
+/**
+ * 회원인증 완료 후, Auth_Code를 이용하여 Token 발급 요청
+ */
+function requestTokenApi(params) {
+
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() { // 요청에 대한 콜백
+    if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
+        if (xhr.status === 200 || xhr.status === 201) 
+        {
+            console.log(xhr.responseText);
+
+            var responseJsonData =   JSON.parse(xhr.responseText);
+            
+            //validation
+            if(responseJsonData.rsp_code && responseJsonData.rsp_code === "O0001"){errorNotice(responseJsonData.rsp_message, true); return;}
+
+
+            requestSaveToken(responseJsonData);
+
+            document.getElementById("notice").innerText = "회원인증/통장개설에 성공 하셨습니다, 곧 창이 닫힙니다.";
+
+            setTimeout(function(){ requestCloseWebView(); }, 1000);
+        } else {
+            console.error(xhr.responseText);
+
+            errorNotice("예기치 못한 에러 발생, 창을 닫고 다시 시도 부탁 드립니다.", true);
+        }
+    }
+    };
+    xhr.open('POST', tokenApiURL); // 메소드와 주소 설정
+    xhr.setRequestHeader('Content-Type', 'application/json'); // 컨텐츠타입을 json으로
+    xhr.send(JSON.stringify(params)); // 데이터를 stringify해서 보냄
+    // xhr.abort(); // 전송된 요청 취소
+}
+function tempRequestTokenApi(){
+    const params = {
+        code: 'testAuthcode-123456',
+        client_id: 'l7xx4ff929f59df4407d8212fd86f7388046',
+        client_secret: 'f3fc3a0536b846ca86e8470b8cd35fea',
+        redirect_uri: 'http://localhost:8880/html/callback.html',
+        grant_type: 'authorization_code',
+    }
+    
+    document.getElementById("code").innerText = params.code;
+    document.getElementById("client_id").innerText = params.client_id;
+    document.getElementById("client_secret").innerText = params.client_secret;
+    document.getElementById("redirect_uri").innerText = params.redirect_uri;
+
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() { // 요청에 대한 콜백
+    if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
+        if (xhr.status === 200 || xhr.status === 201) 
+        {
+            console.log(xhr.responseText);
+
+            var responseJsonData =   JSON.parse(xhr.responseText);
+
+            if(responseJsonData.rsp_code){console.log("rsp_code: true");}
+            if(!responseJsonData.rsp_code){console.log("rsp_code: false");}
+            if(responseJsonData.rsp_code && responseJsonData.rsp_code === "O0001"){errorNotice(responseJsonData.rsp_message, true); return;}
+
+            requestSaveToken(responseJsonData);
+
+            document.getElementById("notice").innerText = "회원인증/통장개설에 성공 하셨습니다, 곧 창이 닫힙니다.";
+
+            setTimeout(function(){ requestCloseWebView(); }, 1000);
+        } else {
+            console.error(xhr.responseText);
+
+            errorNotice("예기치 못한 에러 발생, 창을 닫고 다시 시도 부탁 드립니다.", true);
+        }
+    }
+    };
+    xhr.open('POST', tokenApiURL); // 메소드와 주소 설정
+    xhr.setRequestHeader('Content-Type', 'application/json'); // 컨텐츠타입을 json으로
+    xhr.send(JSON.stringify(params)); // 데이터를 stringify해서 보냄
+    // xhr.abort(); // 전송된 요청 취소
+}
+
+
+/**
+ * 에러 발생 시, Notice 및 Close 버튼 활성화
+ */
+function errorNotice(msg, isClose) 
+{
+    document.getElementById("errorNotice").innerText = msg;
+    document.getElementById("closeArea").style.display = "inline-block";
+}
+
+
+/**
+ * 에러 발생 시, 모바일앱 WebView Close 요청
+ */
+function requestCloseWebView()
+{
+    var postData = {
+        type : 'ASK_WEBVIEWCLOSE',
+    };
+    var data = JSON.stringify(postData);
+
+    window.postMessage(data);
+}
+
+
+function requestSaveToken(responseJsonData)
+{
+    var postData = {
+        type : 'ASK_SAVETOKEN',
+        data: {
+            access_token: responseJsonData.access_token,
+            token_type: responseJsonData.token_type,
+            expires_in: responseJsonData.expires_in,
+            scope: responseJsonData.scope,
+            client_use_code: responseJsonData.client_use_code,
+        }
+    };
+
+    var data = JSON.stringify(postData);
+
+    window.postMessage(data);
+}
+</script>
+
+<body>
+<!-- ===================== bootstrap modal html - start =====================-->
+<!-- 본 페이지 (callback.html) 가 index.html 과 별개로 로딩되기 때문에 단순히 메시지출력 (showMsg()) 을 위해서 추가함 -->
+<div>
+	<div>
+        <div>
+            <div>
+                <p id="errorNotice" style="color:red"></p>
+            </div>
+            <div>
+                <p id="notice" style="color:blue"></p>
+            </div>
+			<div>
+                <p>사용자 인증에 성공/실패 했습니다.</p>
+                <p id="code"></p>
+                <p id="client_id"></p>
+                <p id="client_secret"></p>
+                <p id="redirect_uri"></p>
+                
+			</div>
+			<div>
+                <button type="button" class="btn btn-default" onclick="tempRequestTokenApi();">askBankApiInfo</button>
+                <span id="closeArea"style="display:none"><button type="button" class="btn btn-default" onclick="requestCloseWebView();">Close</button></span>
+			</div>
+		</div><!--// modal-content -->
+	</div><!--// modal-dialog -->
+</div><!--// modal -->
+<!-- ===================== bootstrap modal html - start =====================-->
+</body>
+</html>
