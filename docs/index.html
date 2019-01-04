@@ -96,6 +96,7 @@ function requestTokenApi(params) {
     if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
         if (xhr.status === 200 || xhr.status === 201) 
         {
+            console.log('============== 인증 토큰 요청 성공 ==================');
             console.log(xhr.responseText);
 
             var responseJsonData =   JSON.parse(xhr.responseText);
@@ -107,6 +108,11 @@ function requestTokenApi(params) {
             requestSaveToken(responseJsonData);
 
             document.getElementById("notice").innerText = "회원인증/통장개설에 성공 하셨습니다, 곧 창이 닫힙니다.";
+            document.getElementById("access_token").innerText = responseJsonData.access_token;
+            document.getElementById("token_type").innerText = responseJsonData.token_type;
+            document.getElementById("scope").innerText = responseJsonData.scope;
+            document.getElementById("expires_in").innerText = responseJsonData.expires_in;
+            document.getElementById("client_use_code").innerText = responseJsonData.client_use_code;
 
             setTimeout(function(){ requestCloseWebView(); }, 1000);
         } else {
@@ -228,10 +234,14 @@ function requestSaveToken(responseJsonData)
                 <p id="client_id"></p>
                 <p id="client_secret"></p>
                 <p id="redirect_uri"></p>
-                
+                <p id="access_token"></p>
+                <p id="token_type"></p>
+                <p id="scope"></p>
+                <p id="expires_in"></p>
+                <p id="client_use_code"></p>
 			</div>
 			<div>
-                <button type="button" class="btn btn-default" onclick="tempRequestTokenApi();">askBankApiInfo</button>
+                <button type="button" class="btn btn-default" onclick="requestTokenApi();">askBankApiInfo</button>
                 <span id="closeArea"style="display:none"><button type="button" class="btn btn-default" onclick="requestCloseWebView();">Close</button></span>
 			</div>
 		</div><!--// modal-content -->
