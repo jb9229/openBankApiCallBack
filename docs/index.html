@@ -97,7 +97,7 @@ function requestTokenApi(params) {
     progress("token 요청 함수 시작~");
     progress("token 요청 함수 Params: "+JSON.stringify(params));
     var xhr = new XMLHttpRequest();
-    xhr.onload = function() { // 요청에 대한 콜백
+    xhr.onreadystatechange = function() { // 요청에 대한 콜백
         progress("token 요청 요청에 대한 콜백 시작~");
         if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
             progress("token 요청 요청에 대한 콜백 완료~");
@@ -137,51 +137,6 @@ function requestTokenApi(params) {
     xhr.send(JSON.stringify(params)); // 데이터를 stringify해서 보냄
     // xhr.abort(); // 전송된 요청 취소
 }
-function tempRequestTokenApi(){
-    const params = {
-        code: 'testAuthcode-123456',
-        client_id: 'l7xx4ff929f59df4407d8212fd86f7388046',
-        client_secret: 'f3fc3a0536b846ca86e8470b8cd35fea',
-        redirect_uri: 'http://localhost:8880/html/callback.html',
-        grant_type: 'authorization_code',
-    }
-    
-    document.getElementById("code").innerText = params.code;
-    document.getElementById("client_id").innerText = params.client_id;
-    document.getElementById("client_secret").innerText = params.client_secret;
-    document.getElementById("redirect_uri").innerText = params.redirect_uri;
-
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function() { // 요청에 대한 콜백
-    if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
-        if (xhr.status === 200 || xhr.status === 201) 
-        {
-            console.log(xhr.responseText);
-
-            var responseJsonData =   JSON.parse(xhr.responseText);
-
-            if(responseJsonData.rsp_code){console.log("rsp_code: true");}
-            if(!responseJsonData.rsp_code){console.log("rsp_code: false");}
-            if(responseJsonData.rsp_code && responseJsonData.rsp_code === "O0001"){errorNotice(responseJsonData.rsp_message, true); return;}
-
-            requestSaveToken(responseJsonData);
-
-            document.getElementById("notice").innerText = "회원인증/통장개설에 성공 하셨습니다, 곧 창이 닫힙니다.";
-
-            setTimeout(function(){ requestCloseWebView(); }, 1000);
-        } else {
-            console.error(xhr.responseText);
-
-            errorNotice("예기치 못한 에러 발생, 창을 닫고 다시 시도 부탁 드립니다.", true);
-        }
-    }
-    };
-    xhr.open('POST', tokenApiURL); // 메소드와 주소 설정
-    xhr.setRequestHeader('Content-Type', 'application/json'); // 컨텐츠타입을 json으로
-    xhr.send(JSON.stringify(params)); // 데이터를 stringify해서 보냄
-    // xhr.abort(); // 전송된 요청 취소
-}
-
 
 /**
  * 에러 발생 시, Notice 및 Close 버튼 활성화
