@@ -149,7 +149,7 @@ function errorNotice(msg, isClose)
  */
  function progress(msg) 
 {
-    document.getElementById("progress").innerText = msg;
+    document.getElementById("progress").innerText = '\n'+msg;
 }
 
 
@@ -196,9 +196,6 @@ function requestSaveToken(responseJsonData)
                 <p id="errorNotice" style="color:red"></p>
             </div>
             <div>
-                <p id="progress" style="color:black"></p>
-            </div>
-            <div>
                 <p id="notice" style="color:blue"></p>
             </div>
 			<div>
@@ -212,11 +209,14 @@ function requestSaveToken(responseJsonData)
                 <p id="scope"></p>
                 <p id="expires_in"></p>
                 <p id="client_use_code"></p>
-			</div>
+            </div>
 			<div>
                 <button type="button" class="btn btn-default" onclick="requestTokenApi();">askBankApiInfo</button>
                 <span id="closeArea"style="display:none"><button type="button" class="btn btn-default" onclick="requestCloseWebView();">Close</button></span>
-			</div>
+            </div>
+            <div>
+                <p id="progress" style="color:black"></p>
+            </div>
 		</div><!--// modal-content -->
 	</div><!--// modal-dialog -->
 </div><!--// modal -->
