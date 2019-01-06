@@ -99,8 +99,7 @@ function requestTokenApi(params) {
     xhr.onreadystatechange = function() { // 요청에 대한 콜백
         progress("token 요청에 대한 콜백 시작~");
         if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
-            progress("token 요청에 대한 콜백 완료 log1: "+xhr.status);
-            progress("token 요청에 대한 콜백 완료 log2: "+xhr.responseText);
+            progress("token 요청에 대한 콜백 완료 log1: "+xhr.status+"/"+xhr.responseText);
             if (xhr.status === 200 || xhr.status === 201) 
             {
                 progress("인증 토큰 요청 성공");
