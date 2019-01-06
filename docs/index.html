@@ -16,7 +16,11 @@ const tokenApiURL = 'https://testapi.open-platform.or.kr/oauth/2.0/token';
      //앱 정보를 받기 위한 리스너 설정 
     document.addEventListener('message', function(e) 
     {
+        progress("앱으로부터 MSG 받음~: ");
+
         if(!e.data){document.getElementById("errorNotice").innerText = "앱에서 보낸 api 요청 정보가 올바르지 않습니다!"}
+
+        progress("앱으로부터 MSG: "+e.data);
         var bankApiInfo =   JSON.parse(e.data);
         
         const params    =   getTokenParams(bankApiInfo);
@@ -90,7 +94,8 @@ function getTokenParams(bankApiInfo) {
  * 회원인증 완료 후, Auth_Code를 이용하여 Token 발급 요청
  */
 function requestTokenApi(params) {
-
+    progress("token 요청 함수 시작~");
+    progress("token 요청 함수 Params: "+JSON.stringify(params));
     var xhr = new XMLHttpRequest();
     xhr.onload = function() { // 요청에 대한 콜백
     if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
@@ -182,6 +187,14 @@ function errorNotice(msg, isClose)
     document.getElementById("closeArea").style.display = "inline-block";
 }
 
+/**
+ * 에러 발생 시, Notice 및 Close 버튼 활성화
+ */
+ function progress(msg) 
+{
+    document.getElementById("progress").innerText = msg;
+}
+
 
 /**
  * 에러 발생 시, 모바일앱 WebView Close 요청
@@ -224,6 +237,9 @@ function requestSaveToken(responseJsonData)
         <div>
             <div>
                 <p id="errorNotice" style="color:red"></p>
+            </div>
+            <div>
+                <p id="progress" style="color:black"></p>
             </div>
             <div>
                 <p id="notice" style="color:blue"></p>
