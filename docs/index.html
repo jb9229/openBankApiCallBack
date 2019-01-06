@@ -73,13 +73,9 @@ function getTokenParams(bankApiInfo) {
     if(!bankApiInfo.client_secret || bankApiInfo.client_secret.length === 0){errorNotice("앱으로부터 Token요청 정보를 가져오지 못 했습니다, 창을 닫은 후, 재 시도 부탁 드립니다.", true)}
     if(!bankApiInfo.redirect_uri || bankApiInfo.redirect_uri.length === 0){errorNotice("앱으로부터 Token요청 정보를 가져오지 못 했습니다, 창을 닫은 후, 재 시도 부탁 드립니다.", true)}
 
-    const params = {
-        code: codeParamValue,
-        client_id: bankApiInfo.client_id,
-        client_secret: bankApiInfo.client_secret,
-        redirect_uri: bankApiInfo.redirect_uri,
-        grant_type: 'authorization_code',
-    }
+    const params = `code=${codeParamValue}&client_id=${bankApiInfo.client_id}&client_secret=${bankApiInfo.client_secret}&redirect_uri=${bankApiInfo.redirect_uri}&grant_type=authorization_code`;
+
+    // var res = encodeURI(uri);
     
     document.getElementById("code").innerText = codeParamValue;
     document.getElementById("client_id").innerText = bankApiInfo.client_id;
@@ -131,7 +127,7 @@ function requestTokenApi(params) {
     }
     xhr.open('POST', tokenApiURL, true); // 메소드와 주소 설정
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8'); // 컨텐츠타입을 json으로
-    xhr.send(JSON.stringify(params)); // 데이터를 stringify해서 보냄
+    xhr.send(params); // 데이터를 stringify해서 보냄
     // xhr.abort(); // 전송된 요청 취소
 }
 
@@ -149,7 +145,7 @@ function errorNotice(msg, isClose)
  */
  function progress(msg) 
 {
-    document.getElementById("progress").innerText = '\n'+msg;
+    document.getElementById("progress").innerText += '\n'+msg;
 }
 
 
