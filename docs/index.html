@@ -98,36 +98,41 @@ function requestTokenApi(params) {
     progress("token 요청 함수 Params: "+JSON.stringify(params));
     var xhr = new XMLHttpRequest();
     xhr.onload = function() { // 요청에 대한 콜백
-    if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
-        if (xhr.status === 200 || xhr.status === 201) 
-        {
-            console.log('============== 인증 토큰 요청 성공 ==================');
-            console.log(xhr.responseText);
+        progress("token 요청 요청에 대한 콜백 시작~");
+        if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
+            progress("token 요청 요청에 대한 콜백 완료~");
+            if (xhr.status === 200 || xhr.status === 201) 
+            {
+                progress("인증 토큰 요청 성공");
+                console.log(xhr.responseText);
+                progress("인증 토큰: "+xhr.responseText);
 
-            var responseJsonData =   JSON.parse(xhr.responseText);
-            
-            //validation
-            if(responseJsonData.rsp_code && responseJsonData.rsp_code === "O0001"){errorNotice(responseJsonData.rsp_message, true); return;}
+                var responseJsonData =   JSON.parse(xhr.responseText);
+                
+                //validation
+                if(responseJsonData.rsp_code && responseJsonData.rsp_code === "O0001"){errorNotice(responseJsonData.rsp_message, true); return;}
 
 
-            requestSaveToken(responseJsonData);
+                requestSaveToken(responseJsonData);
 
-            document.getElementById("notice").innerText = "회원인증/통장개설에 성공 하셨습니다, 곧 창이 닫힙니다.";
-            document.getElementById("access_token").innerText = responseJsonData.access_token;
-            document.getElementById("token_type").innerText = responseJsonData.token_type;
-            document.getElementById("scope").innerText = responseJsonData.scope;
-            document.getElementById("expires_in").innerText = responseJsonData.expires_in;
-            document.getElementById("client_use_code").innerText = responseJsonData.client_use_code;
+                document.getElementById("notice").innerText = "회원인증/통장개설에 성공 하셨습니다, 곧 창이 닫힙니다.";
+                document.getElementById("access_token").innerText = responseJsonData.access_token;
+                document.getElementById("token_type").innerText = responseJsonData.token_type;
+                document.getElementById("scope").innerText = responseJsonData.scope;
+                document.getElementById("expires_in").innerText = responseJsonData.expires_in;
+                document.getElementById("client_use_code").innerText = responseJsonData.client_use_code;
 
-            setTimeout(function(){ requestCloseWebView(); }, 1000);
-        } else {
-            console.error(xhr.responseText);
+                setTimeout(function(){ requestCloseWebView(); }, 1000);
+            } else {
+                console.error(xhr.responseText);
 
-            errorNotice("예기치 못한 에러 발생, 창을 닫고 다시 시도 부탁 드립니다.", true);
+                errorNotice("예기치 못한 에러 발생, 창을 닫고 다시 시도 부탁 드립니다.", true);
+            }
+        }else{
+            errorNotice("네트워크 오류, 창을 닫고 다시 시도 부탁 드립니다.", true);
         }
     }
-    };
-    xhr.open('POST', tokenApiURL); // 메소드와 주소 설정
+    xhr.open('POST', tokenApiURL, true); // 메소드와 주소 설정
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8'); // 컨텐츠타입을 json으로
     xhr.send(JSON.stringify(params)); // 데이터를 stringify해서 보냄
     // xhr.abort(); // 전송된 요청 취소
