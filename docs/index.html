@@ -123,7 +123,7 @@ function requestTokenApi(params) {
     }
     };
     xhr.open('POST', tokenApiURL); // 메소드와 주소 설정
-    xhr.setRequestHeader('Content-Type', 'application/json'); // 컨텐츠타입을 json으로
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8'); // 컨텐츠타입을 json으로
     xhr.send(JSON.stringify(params)); // 데이터를 stringify해서 보냄
     // xhr.abort(); // 전송된 요청 취소
 }
