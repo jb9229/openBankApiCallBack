@@ -16,8 +16,6 @@ const tokenApiURL = 'https://testapi.open-platform.or.kr/oauth/2.0/token';
      //앱 정보를 받기 위한 리스너 설정 
     document.addEventListener('message', function(e) 
     {
-        progress("앱으로부터 MSG 받음~: ");
-
         if(!e.data){document.getElementById("errorNotice").innerText = "앱에서 보낸 api 요청 정보가 올바르지 않습니다!"}
 
         progress("앱으로부터 MSG: "+e.data);
@@ -90,15 +88,11 @@ function getTokenParams(bankApiInfo) {
  * 회원인증 완료 후, Auth_Code를 이용하여 Token 발급 요청
  */
 function requestTokenApi(params) {
-    progress("token 요청 함수 Params: "+JSON.stringify(params));
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() { // 요청에 대한 콜백
-        progress("token 요청에 대한 콜백 시작~");
         if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
-            progress("token 요청에 대한 콜백 완료 log1: "+xhr.status+"/"+xhr.responseText);
             if (xhr.status === 200 || xhr.status === 201) 
             {
-                progress("인증 토큰 요청 성공");
                 console.log(xhr.responseText);
                 progress("인증 토큰: "+xhr.responseText);
 
@@ -111,18 +105,17 @@ function requestTokenApi(params) {
                 requestSaveToken(responseJsonData);
 
                 document.getElementById("notice").innerText = "회원인증/통장개설에 성공 하셨습니다, 곧 창이(10초) 닫힙니다.";
-                document.getElementById("acce2ss_token").innerText = responseJsonData.access_token;
+                document.getElementById("access_token").innerText = responseJsonData.access_token;
                 document.getElementById("token_type").innerText = responseJsonData.token_type;
                 document.getElementById("scope").innerText = responseJsonData.scope;
                 document.getElementById("expires_in").innerText = responseJsonData.expires_in;
-                document.getElementById("client_use_code").innerText = responseJsonData.client_use_code;
+                document.getElementById("refresh_token").innerText = responseJsonData.refresh_token;
+                document.getElementById("user_seq_no").innerText = responseJsonData.user_seq_no;
 
                 setTimeout(function(){ requestCloseWebView(); }, 10000);
             } else {
                 errorNotice("예기치 못한 에러 발생, 창을 닫고 다시 시도 부탁 드립니다: "+xhr.responseText, true);
             }
-        }else{
-            errorNotice("네트워크 오류, 창을 닫고 다시 시도 부탁 드립니다.", true);
         }
     }
     xhr.open('POST', tokenApiURL, true); // 메소드와 주소 설정
@@ -171,8 +164,9 @@ function requestSaveToken(responseJsonData)
             access_token: responseJsonData.access_token,
             token_type: responseJsonData.token_type,
             expires_in: responseJsonData.expires_in,
+            refresh_token: responseJsonData.refresh_token,
             scope: responseJsonData.scope,
-            client_use_code: responseJsonData.client_use_code,
+            user_seq_no: responseJsonData.user_seq_no,
         }
     };
 
@@ -204,7 +198,8 @@ function requestSaveToken(responseJsonData)
                 <p id="token_type"></p>
                 <p id="scope"></p>
                 <p id="expires_in"></p>
-                <p id="client_use_code"></p>
+                <p id="refresh_token"></p>
+                <p id="user_seq_no"></p>
             </div>
 			<div>
                 <button type="button" class="btn btn-default" onclick="requestTokenApi();">askBankApiInfo</button>
