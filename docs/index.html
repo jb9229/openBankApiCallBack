@@ -177,38 +177,36 @@ function requestSaveToken(responseJsonData)
 <body>
 <!-- ===================== bootstrap modal html - start =====================-->
 <!-- 본 페이지 (callback.html) 가 index.html 과 별개로 로딩되기 때문에 단순히 메시지출력 (showMsg()) 을 위해서 추가함 -->
-<div>
-	<div>
-        <div style="padding: 20px;">
-            <div>
-                <p></p>
-            </div>
-            <div>
-                <p id="errorNotice" style="color:red"></p>
-            </div>
-            <div>
-                <p id="notice" style="color:blue"></p>
-            </div>
-			<div>
-                <p id="code"></p>
-                <p id="client_id"></p>
-                <p id="client_secret"></p>
-                <p id="redirect_uri"></p>
-                <p id="access_token"></p>
-                <p id="token_type"></p>
-                <p id="scope"></p>
-                <p id="expires_in"></p>
-                <p id="refresh_token"></p>
-                <p id="user_seq_no"></p>
-            </div>
-			<div>
-                <span id="closeArea"style="display:none"><button type="button" class="btn btn-default" style="font-size:20px;" onclick="requestCloseWebView();">닫기</button></span>
-            </div>
-            <div>
-                <p id="progress" style="color:black"></p>
-            </div>
-		</div><!--// modal-content -->
-	</div><!--// modal-dialog -->
+<div style="width: 100%">
+    <div style="padding: 20px;">
+        <div>
+            <p></p>
+        </div>
+        <div>
+            <p id="errorNotice" style="color:red"></p>
+        </div>
+        <div>
+            <p id="notice" style="color:blue"></p>
+        </div>
+        <div>
+            <p id="code"></p>
+            <p id="client_id"></p>
+            <p id="client_secret"></p>
+            <p id="redirect_uri"></p>
+            <p id="access_token"></p>
+            <p id="token_type"></p>
+            <p id="scope"></p>
+            <p id="expires_in"></p>
+            <p id="refresh_token"></p>
+            <p id="user_seq_no"></p>
+        </div>
+        <div>
+            <span id="closeArea"style="display:none"><button type="button" class="btn btn-default" style="font-size:20px;" onclick="requestCloseWebView();">닫기</button></span>
+        </div>
+        <div>
+            <p id="progress" style="color:black"></p>
+        </div>
+    </div><!--// modal-content -->
 </div><!--// modal -->
 <!-- ===================== bootstrap modal html - start =====================-->
 </body>
